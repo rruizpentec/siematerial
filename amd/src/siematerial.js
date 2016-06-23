@@ -24,7 +24,7 @@
 /**
  * @module block_siematerial/siematerial
  */
-define(['jquery'], function($) {
+define(['jquery', 'jqueryui'], function($) {
     var block_siematerial_userid = -1;
 
     /**
@@ -33,7 +33,7 @@ define(['jquery'], function($) {
      */
     function confirm_deletion(fileid) {
         var askquestion = $('#askquestion').val();
-        var dialog = confirm(askquestion);
+        var dialog = window.confirm(askquestion);
         if (dialog === true) {
             var form = document.getElementById('coursefileform');
             document.getElementById('action').value = 'delete';
