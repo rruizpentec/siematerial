@@ -58,7 +58,7 @@ class block_siematerial extends block_base {
      * @return void
      */
     public static function block_siematerial_delete_file() {
-        global $DB, $CFG, $COURSE;
+        global $DB, $CFG, $COURSE, $USER;
         $fileid = required_param('file_id', PARAM_INT);
         $file = $DB->get_record('block_siematerial_uploaded', array('id' => $fileid));
         $coursecontext = context_course::instance($COURSE->id);

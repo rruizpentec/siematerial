@@ -32,9 +32,9 @@ define(['jquery'], function($) {
      * @param fileid File identifier
      */
     function confirm_deletion(fileid) {
-        var askquestion = document.getElementById('askquestion').value;
+        var askquestion = $('#askquestion').val();
         var dialog = confirm(askquestion);
-        if (dialog == true) {
+        if (dialog === true) {
             var form = document.getElementById('coursefileform');
             document.getElementById('action').value = 'delete';
             document.getElementById('file_id').value = fileid;

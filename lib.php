@@ -43,7 +43,7 @@ function block_siematerial_is_student($courseid) {
  * @return void
  */
 function block_siematerial_print_message($msg = null) {
-    global $CFG, $PAGE, $OUTPUT, $DB;
+    global $PAGE, $OUTPUT;
     $systemcontext = context_system::instance();
     require_login();
     $PAGE->set_url('/blocks/siematerial/download.php');
@@ -80,7 +80,7 @@ function block_siematerial_return_file($coursefile) {
     $path = $CFG->dirroot. '/blocks/siematerial/coursefiles/course'.$coursefile->afg_id;
 
     if (!file_exists($path.'/'.$coursefile->realfilename)) {
-        self::block_siematerial_print_message(get_string('not_found', 'block_siematerial'));
+        block_siematerial_print_message(get_string('not_found', 'block_siematerial'));
         return false;
     }
 
@@ -104,7 +104,7 @@ function block_siematerial_return_file($coursefile) {
  * @return string Will return the html tag with the image of the mime type
  */
 function block_siematerial_get_mime_type_image_tag($filename) {
-    global $USER, $DB, $CFG;
+    global $USER, $CFG;
 
     $extensionfile = explode('.', $filename);
     $extensionfile = $extensionfile[1]; // This contains the file extension.
