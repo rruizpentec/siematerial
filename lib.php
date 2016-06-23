@@ -84,7 +84,7 @@ function block_siematerial_return_file($coursefile) {
         return false;
     }
 
-    $headertype = self::block_siematerial_get_file_mime_type($coursefile->filename);
+    $headertype = block_siematerial_get_file_mime_type($coursefile->filename);
     header('Content-Description: File Transfer');
     header("Content-Type: $headertype");
     header('Content-Disposition: attachment; filename="'.$coursefile->filename.'"');
