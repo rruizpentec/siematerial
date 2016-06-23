@@ -7,17 +7,17 @@
 }
 
 .block_siematerial_filepickerbutton  .fp-btn-choose {
-    width: 95% !important;
-    margin-bottom: 5px !important;
+    width: 95%;
+    margin-bottom: 5px;
 }
 
 .block_siematerial_descriptionfile {
-    width: 95% !important;
+    width: 95%;
 }
 
 .block_siematerial_descriptionfile_btn {
-    width: 90% !important;
-    margin-bottom: 5px !important;
+    width: 90%;
+    margin-bottom: 5px;
 }
 
 .block_siematerial_mimetypeimg {
@@ -26,11 +26,11 @@
 }
 
 .block_siematerial_nodatafound {
-    font-style: italic !important;
-    text-align: center !important;
+    font-style: italic;
+    text-align: center;
 }
 
 .block_siematerial_button {
     width: 93%;
-    margin-bottom: 5px !important;
+    margin-bottom: 5px;
 }

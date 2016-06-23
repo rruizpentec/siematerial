@@ -77,7 +77,7 @@ class block_siematerial extends block_base {
      *
      */
     private function get_files_table($course, $coursecontext) {
-        global $USER;
+        global $USER, $DB;
         $table = '';
         $afgidlms = '';
         $categorytype = '';
@@ -123,9 +123,10 @@ class block_siematerial extends block_base {
                     $table .= html_writer::img('../blocks/siematerial/pix/close-icon.png', 'Delete',
                             array(
                                 'onclick' => "(function() {
-                                    require('block_siematerial/siematerial').confirm_delete(".$file->id.")
+                                    require('block_siematerial/siematerial').confirm_deletion(".$file->id.")
                                 })();",
-                                'style'   => 'cursor: pointer;')
+                                'style'   => 'cursor: pointer;',
+                                'id'      => 'block_siematerial_deletefile_'.$file->id)
                     );
                     $table .= html_writer::end_tag('td');
                 }
@@ -236,7 +237,7 @@ class block_siematerial extends block_base {
             }
         }
 
-        $content .= get_files_table($COURSE, $coursecontext);
+        $content .= self::get_files_table($COURSE, $coursecontext);
 
         if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
             $content .= $form->display();
