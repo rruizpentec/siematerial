@@ -184,7 +184,7 @@ class block_siematerial extends block_base {
                  WHERE afg_id = :afgidvalue
                        AND afg_type = :categorytype
                        AND deleted = 0";
-        $result = $DB->get_records_sql($sql, array('afgidvalue' => $afgidlms , 'categorytype' => $categorytype ));
+        $result = $DB->get_recordset_sql($sql, array('afgidvalue' => $afgidlms , 'categorytype' => $categorytype));
         $content .= html_writer::start_tag('table', array('class' => 'table', 'id' => 'coursematerialfilestable'));
         if (count($result) > 0) {
             $content .= html_writer::tag('th', get_string('files', 'block_siematerial').' ('.count($result).')',

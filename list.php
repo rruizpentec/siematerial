@@ -87,7 +87,7 @@ if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
                            AND mfu.afg_type = :category
                            ORDER BY downloaded_date DESC";
     }
-    $records = $DB->get_records_sql($sql, array('afgidlms' => $afgidlms, 'category' => $category));
+    $records = $DB->get_recordset_sql($sql, array('afgidlms' => $afgidlms, 'category' => $category));
 
     $content .= html_writer::start_tag('table', array('class' => 'table'));
     $content .= html_writer::start_tag('tr');
