@@ -72,14 +72,14 @@ if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
     }
 
     if ($action == 'upload') {
-        $sql = "SELECT mfu.id, mfu.filename, u.firstname, u.lastname, mfu.uploaded_date as date
+        $sql = "SELECT mfu.id, mfu.filename, mfu.description, u.firstname, u.lastname, mfu.uploaded_date as date, mfu.deleted
                   FROM {block_siematerial_uploaded} mfu
                   JOIN {user} u ON u.id = mfu.userid
                  WHERE mfu.afg_id = :afgidlms
                        AND mfu.afg_type = :category
                        ORDER BY uploaded_date DESC";
     } else if ($action == 'download') {
-        $sql = "SELECT mfd.id, mfu.filename, u.firstname, u.lastname, mfd.downloaded_date as date
+        $sql = "SELECT mfd.id, mfu.filename, mfu.description, u.firstname, u.lastname, mfd.downloaded_date as date, mfu.deleted
                       FROM {block_siematerial_downloaded} mfd
                       JOIN {block_siematerial_uploaded} mfu ON mfd.fileid = mfu.id
                       JOIN {user} u ON u.id = mfd.userid
@@ -91,18 +91,20 @@ if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
 
     $content .= html_writer::start_tag('table', array('class' => 'table'));
     $content .= html_writer::start_tag('tr');
-    $content .= html_writer::tag('th', get_string('filename', 'block_siematerial'));
+    $content .= html_writer::tag('th', get_string('description', 'block_siematerial'));
     $content .= html_writer::tag('th', get_string('firstname', 'block_siematerial'));
     $content .= html_writer::tag('th', get_string('lastname', 'block_siematerial'));
     $content .= html_writer::tag('th', get_string($action.'eddate', 'block_siematerial'));
+    $content .= html_writer::tag('th', get_string('deleted', 'block_siematerial'));
     $content .= html_writer::end_tag('tr');
 
     foreach ($records as $record) {
         $content .= html_writer::start_tag('tr');
-        $content .= html_writer::tag('td', $record->filename);
+        $content .= html_writer::tag('td', $record->description);
         $content .= html_writer::tag('td', $record->firstname);
         $content .= html_writer::tag('td', $record->lastname);
         $content .= html_writer::tag('td', $record->date);
+        $content .= html_writer::tag('td', get_string(($record->deleted ? 'yes' : 'no'), 'block_siematerial'));
         $content .= html_writer::end_tag('tr');
     }
     $content .= html_writer::end_tag('table');

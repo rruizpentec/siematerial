@@ -73,11 +73,73 @@ class block_siematerial extends block_base {
         }
     }
 
+    private static function get_files_form ($coursecontext) {
+        global $USER, $CFG, $DB;
+        $form = null;
+        if (has_capability('block/siematerial:managefiles', $coursecontext, $USER, true)) {
+            $form = new block_siematerial_form();
+            $afgid = optional_param('afg_id', null, PARAM_INT);
+            $categorytype = optional_param('categorytype', null, PARAM_ALPHAEXT);
+            $courseid = optional_param('courseid', null, PARAM_INT);
+            $description = optional_param('descriptionfile', null, PARAM_TEXT);
+            $action = optional_param('action', null, PARAM_TEXT);
+            if (!isset($action)) {
+                $action = '';
+            }
+            if ($action != 'delete') {
+                if (!isset($afgid)) {
+                    $afgid = '';
+                }
+                if (!isset($categorytype)) {
+                    $categorytype = '';
+                }
+                if (!isset($courseid)) {
+                    $courseid = '';
+                }
+                if (!isset($description)) {
+                    $description = '';
+                }
+                $name = $form->get_new_filename('userfile');
+                $path = $CFG->dirroot. '/blocks/siematerial/coursefiles/course'.$afgid;
+
+                if (!is_dir($path)) {
+                    mkdir($path);
+                }
+                if (is_dir($path)) {
+                    $uniquename = explode('.', $name);
+                    // For prevent files are overwritten.
+                    if (count($uniquename) > 1) {
+                        $uniquename = $uniquename[0]. '.' .md5(uniqid(rand(), true)). '.' .$uniquename[1];
+                    } else {
+                        $uniquename = $name. '.' .md5(uniqid(rand(), true));
+                    }
+                    $completedir = $path.'/'.$uniquename;
+                    if ($form->save_file('userfile', $completedir, true)) {
+                        $record = new stdClass();
+                        $record->description = ($description == '' ? $name : $description);
+                        $record->filename = $name;
+                        $record->afg_id = $afgid;
+                        $record->afg_type = $categorytype;
+                        $record->deleted = 0;
+                        $record->realfilename = $uniquename;
+                        $record->userid = $USER->id;
+                        $record->uploaded_date = date('Y-m-d H:i:s');
+                        $DB->insert_record('block_siematerial_uploaded', $record, false);
+                    }
+                    $form = new block_siematerial_form();
+                } else {
+                    $form = null;
+                }
+            }
+        }
+        return $form;
+    }
+
     /**
      *
      */
     private function get_files_table($course, $coursecontext) {
-        global $USER, $DB;
+        global $USER, $DB, $CFG;
         $table = '';
         $afgidlms = '';
         $categorytype = '';
@@ -96,41 +158,48 @@ class block_siematerial extends block_base {
                        AND afg_type = :categorytype
                        AND deleted = 0";
         $result = $DB->get_recordset_sql($sql, array('afgidvalue' => $afgidlms , 'categorytype' => $categorytype));
-        $table .= html_writer::start_tag('table', array('class' => 'table', 'id' => 'coursematerialfilestable'));
-        if (count($result) > 0) {
-            $table .= html_writer::tag('th', get_string('files', 'block_siematerial').' ('.count($result).')',
-                    array('colspan' => '100%'));
-            foreach ($result as $file) {
-                // Show the description field, but if it is empty, the file name.
-                $filenameshown = $file->description != '' ? $file->description : $file->filename;
-                $filenameshown = block_siematerial_shorten_text_with_ellipsis($filenameshown,
-                        27);
-                $table .= html_writer::start_tag('tr');
-                $table .= html_writer::start_tag('td');
-                $table .= block_siematerial_get_mime_type_image_tag($file->filename);
-                $table .= html_writer::end_tag('td');
-                $table .= html_writer::start_tag('td');
-                $downloadfileurl = $CFG->wwwroot.'/blocks/siematerial/download.php?fileid='.
-                        $file->id.'&afg_id='.$afgidlms.'&courseid='.$COURSE->id;
-                $table .= html_writer::tag('a', $filenameshown, array(
-                    'href' => $downloadfileurl,
-                    'target' => '_blank',
-                    'class' => 'block_siematerial_filelink'));
-                $table .= html_writer::end_tag('td');
-                // File managers can see the delete file button.
-                if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
-                    $table .= html_writer::start_tag('td');
-                    $table .= html_writer::img('../blocks/siematerial/pix/close-icon.png', 'Delete',
-                            array(
-                                'onclick' => "(function() {
-                                    require('block_siematerial/siematerial').confirm_deletion(".$file->id.")
-                                })();",
-                                'style'   => 'cursor: pointer;',
-                                'id'      => 'block_siematerial_deletefile_'.$file->id)
-                    );
-                    $table .= html_writer::end_tag('td');
-                }
+        $filecount = 0;
+        $tablerows = '';
+        foreach ($result as $file) {
+            // Show the description field, but if it is empty, the file name.
+            $filenameshown = $file->description != '' ? $file->description : $file->filename;
+            $filenameshown = block_siematerial_shorten_text_with_ellipsis($filenameshown,
+                    27);
+            $tablerows .= html_writer::start_tag('tr');
+            $tablerows .= html_writer::start_tag('td');
+            $tablerows .= block_siematerial_get_mime_type_image_tag($file->filename);
+            $tablerows .= html_writer::end_tag('td');
+            $tablerows .= html_writer::start_tag('td');
+            $downloadfileurl = $CFG->wwwroot.'/blocks/siematerial/download.php?fileid='.
+                    $file->id.'&afg_id='.$afgidlms.'&courseid='.$course->id;
+            $tablerows .= html_writer::tag('a', $filenameshown, array(
+                'href' => $downloadfileurl,
+                'target' => '_blank',
+                'class' => 'block_siematerial_filelink'));
+            $tablerows .= html_writer::end_tag('td');
+            // File managers can see the delete file button.
+            if (has_capability('block/siematerial:managefiles', $coursecontext, $USER)) {
+                $tablerows .= html_writer::start_tag('td');
+                $tablerows .= html_writer::img('../blocks/siematerial/pix/close-icon.png', 'Delete',
+                        array(
+                            'onclick' => "(function() {
+                                require('block_siematerial/siematerial').confirm_deletion(".$file->id.")
+                            })();",
+                            'style'   => 'cursor: pointer;',
+                            'id'      => 'block_siematerial_deletefile_'.$file->id)
+                );
+                $tablerows .= html_writer::end_tag('td');
             }
+            $filecount++;
+        }
+        // Init tag.
+        $table = html_writer::start_tag('table', array('class' => 'table', 'id' => 'coursematerialfilestable'));
+        // Table header.
+        if ($filecount > 0) {
+            $table .= html_writer::start_tag('tr');
+            $table .= html_writer::tag('th', get_string('files', 'block_siematerial').' ('.$filecount.')',
+                    array('colspan' => '100%'));
+            $table .= html_writer::end_tag('tr');
         } else {
             $table .= html_writer::tag('th', get_string('files', 'block_siematerial'));
             $table .= html_writer::start_tag('tr');
@@ -138,6 +207,9 @@ class block_siematerial extends block_base {
                     array('class' => 'block_siematerial_nodatafound'));
             $table .= html_writer::end_tag('tr');
         }
+        // Table body.
+        $table .= $tablerows;
+        // End tag.
         $table .= html_writer::end_tag('table');
         return $table;
     }
@@ -186,55 +258,9 @@ class block_siematerial extends block_base {
 
         // The teachers of this course or admins, could see the upload files form.
         $coursecontext = context_course::instance($COURSE->id);
-        if (has_capability('block/siematerial:managefiles', $coursecontext, $USER, true)) {
-            $form = new block_siematerial_form();
-            $afgid = optional_param('afg_id', null, PARAM_INT);
-            $categorytype = optional_param('categorytype', null, PARAM_ALPHAEXT);
-            $courseid = optional_param('courseid', null, PARAM_INT);
-            $description = optional_param('descriptionfile', null, PARAM_TEXT);
-
-            if (!isset($afgid)) {
-                $afgid = '';
-            }
-            if (!isset($categorytype)) {
-                $categorytype = '';
-            }
-            if (!isset($courseid)) {
-                $courseid = '';
-            }
-            if (!isset($description)) {
-                $description = '';
-            }
-            $name = $form->get_new_filename('userfile');
-            $path = $CFG->dirroot. '/blocks/siematerial/coursefiles/course'.$afgid;
-
-            if (!is_dir($path)) {
-                mkdir($path);
-            }
-            if (is_dir($path)) {
-                $uniquename = explode('.', $name);
-                // For prevent files are overwritten.
-                if (count($uniquename) > 1) {
-                    $uniquename = $uniquename[0]. '.' .md5(uniqid(rand(), true)). '.' .$uniquename[1];
-                } else {
-                    $uniquename = $name. '.' .md5(uniqid(rand(), true));
-                }
-                $completedir = $path.'/'.$uniquename;
-                if ($form->save_file('userfile', $completedir, true)) {
-                    $record = new stdClass();
-                    $record->description = $description;
-                    $record->filename = $name;
-                    $record->afg_id = $afgid;
-                    $record->afg_type = $categorytype;
-                    $record->deleted = 0;
-                    $record->realfilename = $uniquename;
-                    $record->userid = $USER->id;
-                    $record->uploaded_date = date('Y-m-d H:i:s');
-                    $DB->insert_record('block_siematerial_uploaded', $record, false);
-                }
-            } else {
-                $content .= get_string('unabletomakedir', 'block_siematerial');
-            }
+        $form = self::get_files_form($coursecontext);
+        if (!$form) {
+            $content .= get_string('unabletomakedir', 'block_siematerial');
         }
 
         $content .= self::get_files_table($COURSE, $coursecontext);

@@ -74,8 +74,6 @@ try {
                     } catch (Exception $e) {
                         $transaction->rollback($e);
                     }
-                } else {
-                    $file = null;
                 }
             }
         }
@@ -84,10 +82,8 @@ try {
     if ($file) {
         block_siematerial_return_file($file);
     } else {
-        block_siematerial_print_message(get_string('wrong_resource',
-                'block_siematerial'));
+        block_siematerial_print_message(get_string('wrong_resource', 'block_siematerial'));
     }
 } catch (Exception $ex) {
-    block_siematerial_print_message(get_string('wrong_resource',
-            'block_siematerial'));
+    block_siematerial_print_message(get_string('wrong_resource', 'block_siematerial'));
 }
