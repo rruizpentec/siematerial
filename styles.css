@@ -1,0 +1,36 @@
+.block_siematerial_filelink {
+    cursor: pointer;
+}
+
+.block_siematerial_filelink:hover {
+    text-decoration: underline;
+}
+
+.block_siematerial_filepickerbutton  .fp-btn-choose {
+    width: 95% !important;
+    margin-bottom: 5px !important;
+}
+
+.block_siematerial_descriptionfile {
+    width: 95% !important;
+}
+
+.block_siematerial_descriptionfile_btn {
+    width: 90% !important;
+    margin-bottom: 5px !important;
+}
+
+.block_siematerial_mimetypeimg {
+    width: 20px;
+    height: 20px;
+}
+
+.block_siematerial_nodatafound {
+    font-style: italic !important;
+    text-align: center !important;
+}
+
+.block_siematerial_button {
+    width: 93%;
+    margin-bottom: 5px !important;
+}
