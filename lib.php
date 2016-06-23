@@ -93,7 +93,6 @@ function block_siematerial_return_file($coursefile) {
     header('Pragma: public');
     header('Content-Length: '.filesize($path.'/'.$coursefile->realfilename));
     readfile($path.'/'.$coursefile->realfilename);
-    exit;
 }
 
 /**
@@ -104,59 +103,45 @@ function block_siematerial_return_file($coursefile) {
  * @return string Will return the html tag with the image of the mime type
  */
 function block_siematerial_get_mime_type_image_tag($filename) {
-    global $USER, $CFG;
-
     $extensionfile = explode('.', $filename);
     $extensionfile = $extensionfile[1]; // This contains the file extension.
 
     $out = ''; // Return html string .
-
+    $imagesrc = '../blocks/siematerial/pix/';
     switch($extensionfile) {
         case 'png':
         case 'jpg':
         case 'jpeg':
         case 'bmp':
         case 'gif':
-            $out = html_writer::img('../blocks/siematerial/pix/images.png', '',
-                array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'images.png';
             break;
-
         case 'rar':
         case 'zip':
-            $out = html_writer::img('../blocks/siematerial/pix/rar.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'rar.png';
             break;
-
         case 'wmv':
         case 'avi':
         case 'flv':
-            $out = html_writer::img('../blocks/siematerial/pix/video.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'video.png';
             break;
-
         case 'doc':
         case 'docx':
         case 'xls':
         case 'xlsx':
-            $out = html_writer::img('../blocks/siematerial/pix/word.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'word.png';
             break;
-
         case 'txt':
-            $out = html_writer::img('../blocks/siematerial/pix/text.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'text.png';
             break;
-
         case 'pdf':
-            $out = html_writer::img('../blocks/siematerial/pix/pdf.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'pdf.png';
             break;
-
         default:
-            $out = html_writer::img('../blocks/siematerial/pix/unknown.png', '',
-                    array('class' => 'block_siematerial_mimetypeimg'));
+            $imagesrc .= 'unknown.png';
             break;
     }
+    $out = html_writer::img($imagesrc, '', array('class' => 'block_siematerial_mimetypeimg'));
     return $out;
 }
 
@@ -206,7 +191,7 @@ function block_siematerial_get_file_mime_type($filename) {
 function block_siematerial_shorten_text_with_ellipsis($text, $maxlength) {
     $result = $text;
     if (strlen($text) > $maxlength - 3) {
-        $filenameshown = substr_replace($text, '...', $maxlength, strlen($text));
+        $result = substr_replace($text, '...', $maxlength, strlen($text));
     }
     return $result;
 }
